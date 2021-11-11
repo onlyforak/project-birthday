@@ -1,0 +1,279 @@
+<template lang="pug">
+.container
+  .text(data-splitting='') C Днем Рождения!
+  .presents
+    .present.orange
+      .lid
+      .box
+      .bow
+      .ribbon
+    .present.blue
+      .lid
+      .box
+      .bow
+      .ribbon
+    .present.green
+      .lid
+      .box
+      .bow
+      .ribbon
+</template>
+
+<script>
+import "splitting/dist/splitting.css";
+import "splitting/dist/splitting-cells.css";
+import Splitting from "splitting";
+import mojs from "mo-js";
+document.addEventListener("click", (event) => {
+  bursty(event.pageX, event.pageY);
+});
+
+
+
+function bursty(x, y) {
+  const burst = new mojs.Burst({
+    left: 0,
+    top: 0,
+    radius: { 0: 200 },
+    count: 20,
+    degree: 360,
+    children: {
+      fill: { red: "red" },
+      duration: 2000
+    }
+  }).tune({
+    x: x,
+    y: y
+  });
+
+  burst.replay();
+}
+
+function randomizedConfetti() {
+  let randomX = Math.floor(Math.random() * (document.body.clientWidth-100) + 0);
+  let randomY = Math.floor(Math.random() * (window.innerHeight-100) + 0);
+  const burst = new mojs.Burst({
+    left: 0,
+    top: 0,
+    radius: { 0: 150 },
+    count: 20,
+    degree: 360,
+    children: {
+      fill: { red: "red" },
+      duration: 2000
+    }
+  }).tune({
+    x: randomX,
+    y: randomY
+  });
+
+  burst.replay();
+}
+
+Splitting();
+
+export default {
+  name: 'Birthday',
+  props: {
+    msg: String
+  },
+  data(){
+    return {
+      interval: null
+    }
+  },
+  created() {
+    this.interval = setInterval(() => randomizedConfetti(), 500);
+    this.$axios.post("http://34.88.47.51/api/enter/birthday",{},{
+      crossdomain: true,
+      headers: {
+        'accept-language': 11111998
+      }
+    }).then(res=>{
+      console.log(res)
+    })
+  },
+  destroyed() {
+    clearInterval(this.interval)
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+$border-color: black;
+$border: 4px solid $border-color;
+$border-radius: 5px;
+$bow-color: #51ff4b;
+
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.text {
+  min-width: 100%;
+  text-align: center;
+  color: red;
+  text-shadow: 2px 2px $border-color;
+  font-size: 3em;
+  font-family: "Yandex-UI-Icons-Private",cursive;
+}
+
+.text .char {
+  animation: slide-in 1s cubic-bezier(.5, 0, .5, 1) both;
+  animation-delay: calc(60ms * var(--char-index));
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(-1em) rotate(-.5turn) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.presents {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 200px;
+}
+
+@mixin present($name, $positionx, $box-color, $bow-color, $dot-color, $width, $height, $z-index) {
+  position: relative;
+  left: $positionx;
+  width: $width;
+  height: $height;
+  z-index: $z-index;
+
+  &:hover {
+    animation: .5s #{$name};
+  }
+
+  .lid {
+    background: $box-color;
+  }
+  .box {
+    background-image: radial-gradient($dot-color 20%, transparent 20%),
+    radial-gradient($dot-color 20%, transparent 20%);
+    background-color: $box-color;
+  }
+  .ribbon {
+    background: $bow-color;
+    &::before {
+      top: 21%;
+    }
+  }
+  .bow {
+    background: $bow-color;
+    &::before, &::after {
+      background: $bow-color;
+    }
+  }
+
+  @keyframes #{$name} {
+    0% {
+      width: $width;
+      height: $height;
+    }
+    30% {
+      width: calc(#{$width} + 10px);
+      height: calc(#{$height} - 10px);
+    }
+    60% {
+      width: calc(#{$width} - 10px);
+      height: calc(#{$height} + 10px);
+    }
+    100% {
+      width: $width;
+      height: $height;
+    }
+  }
+}
+
+.green {
+  @include present('green', -20px, #3DDC81, #F75D4C, #fff, 100px, 100px, 1);
+}
+
+.orange {
+  @include present('orange', 20px, #FFA726, #F75D4C, $border-color, 130px, 120px, 10);
+}
+
+.blue {
+  @include present('blue', 0, #1BB5FE, #3DDC81, transparent, 120px, 160px, 0);
+}
+
+.present {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  .lid {
+    height: 20%;
+    width: calc(100% + 10px);
+    border: $border;
+    border-radius: $border-radius;
+    box-shadow: inset 2px 2px rgba(255,255,255,.5), 5px 0 rgba(0,0,0,.15);
+  }
+  .box {
+    width: 100%;
+    height: 100%;
+    background-position: 0 0, 20px 20px;
+    background-size: 40px 40px;
+    border: $border;
+    border-top: 0;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+    box-shadow: inset -10px 5px rgba(0,0,0,.3), 5px 0 rgba(0,0,0,.15);
+  }
+  .ribbon {
+    position: absolute;
+    top: -3px;
+    width: 30px;
+    height: calc(100% - 5px);
+    border: $border;
+    border-radius: $border-radius;
+    box-shadow: inset 2px 2px rgba(255,255,255,.5);
+    &::before {
+      display: block;
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 5px;
+      background: rgba(0,0,0,.3);
+    }
+  }
+  .bow {
+    position: absolute;
+    top: -20px;
+    width: 20px;
+    height: 20px;
+    border: $border;
+    border-radius: 50%;
+    box-shadow: inset 2px 2px rgba(255,255,255,.5), inset -2px -5px rgba(0,0,0,.3);
+    &::before, &::after {
+      display: block;
+      content: '';
+      position: absolute;
+      top: -10px;
+      width: 30px;
+      height: 30px;
+      border: $border;
+      border-radius: 50%;
+      box-shadow: inset 2px 2px rgba(255,255,255,.5), inset -2px -5px rgba(0,0,0,.3);
+      z-index: -1;
+    }
+    &::before {
+      left: 15px;
+    }
+    &::after {
+      right: 15px;
+    }
+  }
+}
+</style>
